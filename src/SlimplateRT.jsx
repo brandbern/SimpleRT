@@ -1,8 +1,8 @@
 import React from 'react'
 import cx from 'classnames'
 import Toolbar from './Toolbar'
-import EditorView from './editor/EditorView'
-import { EditorProvider } from './editor/EditorContext'
+import EditorView from './editor/editor/EditorView'
+import { EditorProvider } from './editor/editor/EditorContext'
 import { Link, Album, Emphasis, LetterH, Quote, Italic, Bold, List, ListNumbers } from 'tabler-icons-react'
 
 import {
@@ -17,7 +17,7 @@ import {
   ToolbarButtonOrderedList,
   ToolbarButtonUnorderedList,
   ToolbarButtonEmphasis
-} from '../buttons/components'
+} from './buttons/components'
 
 const CodeSVG = () => (
   <svg
