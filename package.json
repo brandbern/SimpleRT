@@ -1,10 +1,23 @@
 {
-  "version": "0.1.20",
+  "version": "0.0.1",
   "name": "lib-template",
   "main": "src/index.js",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1"
+  },
+   "devDependencies": {
+    "unified": "^10.1.2",
+    "classnames": "^2.3.2",
+    "remark-mdx": "^2.3.0",
+    "rehype-parse": "^8.0.4",
+    "remark-html": "^15.0.2",
+    "rehype-remark": "^9.1.2",
+    "remark-parse": "^10.0.1",
+    "unist-util-visit": "^4.1.2",
+    "remark-stringify": "^10.0.2",
+    "tabler-icons-react": "^1.56.0",
+    "react-style-object-to-css": "^1.1.2"
   }
 }
