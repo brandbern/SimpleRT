@@ -35,7 +35,7 @@ const CodeSVG = () => (
   </svg>
 )
 
-export default function SimpleRT ({ value, onChange, name, editorStyles, className, enabledButtons = {}, children }) {
+export default function SlimplateRT ({ value, onChange, name, editorStyles, className, enabledButtons = {}, children }) {
   return (
     <div className={cx(className)}>
       <EditorProvider
