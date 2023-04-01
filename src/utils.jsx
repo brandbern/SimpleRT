@@ -6,6 +6,7 @@ import rehypeRemark from 'rehype-remark'
 import remarkStringify from 'remark-stringify'
 import remarkMdx from 'remark-mdx'
 import { visit } from 'unist-util-visit'
+import { toMarkdown } from 'mdast-util-to-markdown'
 
 /* global crypto */
 
@@ -15,8 +16,9 @@ function uuidv4 () {
   )
 }
 
-export function outputComponentPlaceHolder ({ type, name, props = {} }) {
+export function outputComponentPlaceHolder ({ type, name, props = {}, children }) {
   const propsString = escape(JSON.stringify(props))
+  const childrenString = escape(JSON.stringify(children))
   const id = uuidv4()
   return `
   <slim-div
@@ -24,6 +26,7 @@ export function outputComponentPlaceHolder ({ type, name, props = {} }) {
   contenteditable="false"
   data-type="${type}"
   data-props="${propsString}"
+  data-children="${childrenString}"
   class="wrapper"
 >
   <button class='display' contenteditable="false" onclick="window.parent.postMessage({ action: 'edit', id: '${id}',  type: '${type}', name: '${name}' })">Edit ${type}</button>
@@ -50,7 +53,7 @@ export function remarkSlimplate ({ name = 'YOU_SHOULD_SET_THIS' }) {
       node.type = 'html'
 
       const props = {}
-      // TODO: handle children?
+
       for (const prop of node.attributes) {
         if (prop.value?.type === 'mdxJsxAttributeValueExpression') {
           props[prop.name] = JSON.parse(prop.value.value)
@@ -59,10 +62,13 @@ export function remarkSlimplate ({ name = 'YOU_SHOULD_SET_THIS' }) {
         }
       }
 
-      node.value = outputComponentPlaceHolder({ name, type: node.name, props })
+      node.value = outputComponentPlaceHolder({ name, type: node.name, props, children: node.children })
+      delete node.children
     }
   })
 }
+
+const u = unified().use(remarkParse).use(remarkStringify)
 
 // turn <button data-props='{p1: 1}'>Element</button> into <Element p1=1 />
 function slimplatePatchButton (state, node) {
@@ -70,9 +76,17 @@ function slimplatePatchButton (state, node) {
 
   const p = JSON.parse(unescape(node?.properties?.dataProps || '%7B%7D'))
   const tag = node?.properties?.dataType
-  delete node.children
   const props = Object.keys(p).map(k => `${k}=${typeof p[k] === 'string' ? JSON.stringify(p[k]).replace(/"/g, "'") : `{${JSON.stringify(p[k])}}`}`)
-  node.value = `<${tag} ${props.join(' ')} />`
+
+  const children = JSON.parse(unescape(node?.properties?.dataChildren || '%5B%5D'))
+
+  if (children.length) {
+    // TODO: what do I do with children here? I want to turn AST into MDX
+    node.value = `<${tag} ${props.join(' ')}>\n${toMarkdown(children[0])}</${tag}>`
+  } else {
+    node.value = `<${tag} ${props.join(' ')} />`
+  }
+
   return node
 }
 
@@ -80,18 +94,17 @@ function slimplatePatchButton (state, node) {
 export const mdx2html = async (input, options = {}) => {
   const out = await unified()
     .use(remarkParse)
-    // .use(remarkMdx, { removeUnnecessaryCode: false })
-    // .use(remarkSlimplate, options)
-    .use(remarkHtml)
+    .use(remarkMdx)
+    .use(remarkSlimplate, options)
+    .use(remarkHtml, { sanitize: false })
     .process(input)
     .then(({ value }) => value)
-  // console.log('mdx2html', out)
+  console.log('mdx2html', out)
   return out
 }
 
 // Turns HTML (from editor) to MDX (for file)
 export const html2mdx = async (input, options = {}) => {
-  console.log(input)
   const out = await unified()
     .use(rehypeParse)
     .use(rehypeRemark, { handlers: { 'slim-div': slimplatePatchButton } })
