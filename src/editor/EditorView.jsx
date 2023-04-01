@@ -39,7 +39,8 @@ export default function EditorView () {
       const parent = selection?.focusNode?.parentNode?.localName
       const header = headers.some(v => parent?.includes(v))
       const quote = parent === 'blockquote' || selection?.focusNode?.parentNode?.parentNode?.localName === 'blockquote'
-      setButtonStatus({
+      const commandStates = {
+        ...activeStates,
         insertUnorderedList: doc.queryCommandState('insertUnorderedList'),
         insertOrderedList: doc.queryCommandState('insertOrderedList'),
         italic: !quote && doc.queryCommandState('italic'),
@@ -50,7 +51,8 @@ export default function EditorView () {
         image: parent === 'img',
         header,
         quote
-      })
+      }
+      setButtonStatus(commandStates)
     }
   }
 

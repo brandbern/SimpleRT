@@ -1,3 +1,4 @@
+import ToolbarButton from './ToolbarButton'
 import ToolbarButtonBold from './ToolbarButtonBold'
 import ToolbarButtonCode from './ToolbarButtonCode'
 import ToolbarButtonLink from './ToolbarButtonLink'
@@ -14,6 +15,7 @@ import ToolbarButtonEmphasis from './ToolbarButtonEmphasis'
 
 
 export {
+  ToolbarButton,
   ToolbarButtonBold,
   ToolbarButtonCode,
   ToolbarButtonLink,

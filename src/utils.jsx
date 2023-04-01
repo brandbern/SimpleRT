@@ -99,7 +99,7 @@ export const mdx2html = async (input, options = {}) => {
     .use(remarkHtml, { sanitize: false })
     .process(input)
     .then(({ value }) => value)
-  console.log('mdx2html', out)
+  // console.log('mdx2html', out)
   return out
 }
 
